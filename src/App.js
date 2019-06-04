@@ -29,10 +29,12 @@ class MenuEpingle extends React.Component{
   constructor(props){
     super(props)
     this.state={
-      data:[]
+      data:[],
+      items:[]
     }
     this.chargerImage=this.chargerImage.bind(this)
     this.handleInput=this.handleInput.bind(this)
+    this.pinSet=this.pinSet.bind(this)
   }
   chargerImage(){
     console.log("bam")
@@ -58,17 +60,45 @@ class MenuEpingle extends React.Component{
     console.log("yo")
     this.chargerImage()
   }
+  pinSet(){
 
-  //finir la transaction apres remise du fichier et au moment de la commande pin
-  // retrouver le fichier et l'afficher
+  var self=this
+  node.pin.ls(function (err, pinset) {
+    if (err) {throw err}
+
+    console.log("pinset",pinset)
+    var items=[]
+    pinset.forEach((x,i)=>{
+      console.log("item",x)
+      items.push(
+        <Pin hash={x.hash} key={i}/>
+      )
+    })
+    self.setState({items:items})
+    return items
+  })
+  }
 
   render(){
+    //let items=this.pinSet()
     return(
       <div>
         <input type="file" onChange={this.handleInput} id="fichier"></input>
         <button onClick={this.chargerImage}>Add Document</button>
         <button onClick={this.pinImage}>Pin Document</button>
+        <button onClick={this.pinSet}>Pin Set</button>
         <ListeEpingle data={this.state.data}/>
+        {this.state.items}
+      </div>
+    )
+  }
+}
+
+class Pin extends React.Component{
+  render(props){
+    return(
+      <div>
+        Pinned : {this.props.hash}
       </div>
     )
   }
@@ -116,7 +146,11 @@ class Epingle extends React.Component{
       gasLimit: 500000,
     }
     console.log(h)
-    ContratEpingleSigner.payerStockage(h,overrides)
+    ContratEpingleSigner.payerStockage(h,overrides).then(function(){
+    node.pin.add(h,function(err){
+      console.log(err)
+    })
+    })
 
   }
 
