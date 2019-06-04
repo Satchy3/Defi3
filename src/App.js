@@ -3,11 +3,11 @@ import logo from './logo.svg';
 import './App.css';
 import {ethers} from 'ethers'
 const ipfs = require('ipfs')
-const node= new ipfs()
+const node= new ipfs({ repo: './ipfs/data' })
 //SETUP for ethers
 const id_user=0;
 const privatekeySelectUserId=""
-const contractAddress="0x4b9715976a6AB1AED7Ea73BD9181C02DEc0DB5B8"
+const contractAddress="0x57785681d3b1F7f3A65913d47DBa1a51b107fc61"
 const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 var truffleFile= require('./contracts/epinglage.json')
 var contractABI = truffleFile['abi']
@@ -21,6 +21,8 @@ node.on('ready',()=>{
   console.log('bastard')
   //afficher les noeuds fournis par la lib ipfs
   console.log(node.swarm.addrs())
+  node.repo.stat((err, stats) => console.log("stats",stats))
+
 })
 
 
@@ -116,11 +118,12 @@ class MenuEpingle extends React.Component{
     //this.setState({items:items})
     return(
       <div>
-        <input type="file" onChange={this.handleInput} id="fichier"></input>
+        Epingler un fichier png <input type="file" onChange={this.handleInput} id="fichier"></input>
         <button onClick={this.chargerImage}>Add Document</button>
-        <button onClick={this.pinSet}>Pin Set</button>
+        <button onClick={this.pinSet}>Rafraichir liste des fichiers epingles</button>
         <ListeEpingle data={this.state.data}/>
         {this.state.items}
+        <DisplayImage />
       </div>
     )
   }
@@ -131,6 +134,7 @@ class Pin extends React.Component{
     super(props)
     this.state={hash:''}
     this.getpin=this.getpin.bind(this)
+    this.getpinImage=this.getpinImage.bind(this)
   }
   getpin(props){
     console.log("getpin",this.props)
@@ -141,16 +145,46 @@ class Pin extends React.Component{
       })
     })
   }
+
+  getpinImage(props){
+    function bufferToBase64(buf) {
+        var binstr = Array.prototype.map.call(buf, function (ch) {
+            return String.fromCharCode(ch);
+        }).join('');
+        return btoa(binstr);
+    }
+    console.log("getpinImage",this.props)
+    node.cat(this.props.hash, function (err, file) {
+          console.log("path",file)
+          var blob = new Blob( [ file ], { type: "image/jpeg" } );
+          var urlCreator = window.URL || window.webkitURL;
+          var imageUrl = urlCreator.createObjectURL( blob );
+          var img = document.querySelector( "#design_display" );
+          img.src = imageUrl;
+    })
+
+  }
   render(props){
     return(
       <div>
         Pinned : {this.props.hash}
-        <button onClick={this.getpin}> GET</button>
+        <button onClick={this.getpin}> GET RAW FILE</button>
+        <button onClick={this.getpinImage}> DISPLAY IMAGE</button>
       </div>
     )
   }
 }
 
+class DisplayImage extends React.Component{
+  render(){
+    return(
+      <div>
+      <img id="design_display" src=""/>
+      </div>
+    )
+  }
+
+}
 //class ListeEpingle
 class ListeEpingle extends React.Component{
   render(props){
@@ -213,6 +247,7 @@ class Epingle extends React.Component{
 
 //Main function
 function App() {
+
   return (
     <div className="App">
       <MenuEpingle />
