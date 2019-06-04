@@ -41,8 +41,9 @@ class MenuEpingle extends React.Component{
     this.listPin()
   }
   chargerImage(){
-    console.log("bam")
+
     let doc=document.getElementById("fichier").files[0]
+    console.log("bam",doc)
     const reader = new FileReader();
     //reader.readAsBinaryString(doc)
     reader.readAsArrayBuffer(doc)
@@ -76,15 +77,13 @@ class MenuEpingle extends React.Component{
       node.on('ready',function(){
         node.pin.ls(function (err, pinset) {
           if (err) {throw err}
-
           console.log("pinset",pinset)
-
           pinset.forEach((x,i)=>{
             console.log("item pinset",x)
-            items.push(
+            if (x.type!="indirect"){items.push(
               <Pin hash={x.hash} key={i}/>
             )
-          })
+          }})
           self.setState({items:items})
           return items
         })
@@ -103,10 +102,10 @@ class MenuEpingle extends React.Component{
 
       pinset.forEach((x,i)=>{
         console.log("item pinset",x)
-        items.push(
+        if (x.type!="indirect"){items.push(
           <Pin hash={x.hash} key={i}/>
         )
-      })
+      }})
       self.setState({items:items})
       return items
     })
@@ -185,7 +184,7 @@ class DisplayImage extends React.Component{
   }
 
 }
-//class ListeEpingle
+//class ListeEpingle = elements deja epingles
 class ListeEpingle extends React.Component{
   render(props){
     console.log("liste epingle", this.props.data)
@@ -205,7 +204,7 @@ class ListeEpingle extends React.Component{
 }
 
 
-// class Epingle pour chaque ligne
+// class Epingle pour chaque ligne de la ListeEpingle
 class Epingle extends React.Component{
   constructor(props){
     super(props)
@@ -216,6 +215,8 @@ class Epingle extends React.Component{
   pin(props){
     console.log("pin",this.props)
     let h=this.props.hash
+
+    //Payer l'epinglage
     let val=1*10**16
     // let tax=this.state.prix*0.02
     let v=val.toString()
