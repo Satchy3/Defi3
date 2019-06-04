@@ -35,6 +35,8 @@ class MenuEpingle extends React.Component{
     this.chargerImage=this.chargerImage.bind(this)
     this.handleInput=this.handleInput.bind(this)
     this.pinSet=this.pinSet.bind(this)
+    this.listPin=this.listPin.bind(this)
+    this.listPin()
   }
   chargerImage(){
     console.log("bam")
@@ -60,32 +62,62 @@ class MenuEpingle extends React.Component{
     console.log("yo")
     this.chargerImage()
   }
+
+  componentDidMount(){
+    console.log("mounted")
+    this.pinSet()
+  }
+  listPin(){
+    var self=this
+    var items=[]
+    console.log("listpin")
+      node.on('ready',function(){
+        node.pin.ls(function (err, pinset) {
+          if (err) {throw err}
+
+          console.log("pinset",pinset)
+
+          pinset.forEach((x,i)=>{
+            console.log("item pinset",x)
+            items.push(
+              <Pin hash={x.hash} key={i}/>
+            )
+          })
+          self.setState({items:items})
+          return items
+        })
+      })
+
+  }
   pinSet(){
 
-  var self=this
-  node.pin.ls(function (err, pinset) {
-    if (err) {throw err}
-
-    console.log("pinset",pinset)
+    var self=this
     var items=[]
-    pinset.forEach((x,i)=>{
-      console.log("item",x)
-      items.push(
-        <Pin hash={x.hash} key={i}/>
-      )
+
+    node.pin.ls(function (err, pinset) {
+      if (err) {throw err}
+
+      console.log("pinset",pinset)
+
+      pinset.forEach((x,i)=>{
+        console.log("item pinset",x)
+        items.push(
+          <Pin hash={x.hash} key={i}/>
+        )
+      })
+      self.setState({items:items})
+      return items
     })
-    self.setState({items:items})
-    return items
-  })
   }
 
   render(){
     //let items=this.pinSet()
+    //console.log("render pinset",items)
+    //this.setState({items:items})
     return(
       <div>
         <input type="file" onChange={this.handleInput} id="fichier"></input>
         <button onClick={this.chargerImage}>Add Document</button>
-        <button onClick={this.pinImage}>Pin Document</button>
         <button onClick={this.pinSet}>Pin Set</button>
         <ListeEpingle data={this.state.data}/>
         {this.state.items}
@@ -95,10 +127,25 @@ class MenuEpingle extends React.Component{
 }
 
 class Pin extends React.Component{
+  constructor(props){
+    super(props)
+    this.state={hash:''}
+    this.getpin=this.getpin.bind(this)
+  }
+  getpin(props){
+    console.log("getpin",this.props)
+    node.get(this.props.hash, function (err, files) {
+      files.forEach((file) => {
+          console.log("path",file.path)
+          console.log("content",file.content.toString('utf8'))
+      })
+    })
+  }
   render(props){
     return(
       <div>
         Pinned : {this.props.hash}
+        <button onClick={this.getpin}> GET</button>
       </div>
     )
   }
@@ -110,7 +157,7 @@ class ListeEpingle extends React.Component{
     console.log("liste epingle", this.props.data)
     var items=[]
     this.props.data.forEach((x,i)=>{
-      console.log(x,i)
+      console.log("Liste Epingle",x,i)
       items.push(
         <Epingle hash={x[0].hash} size={x[0].size} key={i}/>
       )
