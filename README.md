@@ -14,11 +14,11 @@ build and deploy contracts with: ./truffle migrate
 
 ### `Setup`
 
-App.js: line 6 and 8
+./src/App.js: line 10
 
 copy and update contract address in App.js line 8
 
-    const contractMarketAddress="0x8584eBAc96B0688625f04Dcd3c0305F5DD8457b6"
+    const contractAddress="0x8584eBAc96B0688625f04Dcd3c0305F5DD8457b6"
 
 update ganache id_user and its private key
 
