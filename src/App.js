@@ -56,7 +56,7 @@ class MenuEpingle extends React.Component{
         //retourne le hash du fichier
         console.log("ajouté",hash)
         let h= self.state.data
-        h.push(hash)
+        h.push([hash,doc.name])
         self.setState({data:h})
       })
     }
@@ -118,7 +118,7 @@ class MenuEpingle extends React.Component{
     return(
       <div>
         Epingler un fichier png <input type="file" onChange={this.handleInput} id="fichier"></input>
-        <button onClick={this.chargerImage}>Add Document</button>
+        
         <button onClick={this.pinSet}>Rafraichir liste des fichiers epingles</button>
         <ListeEpingle data={this.state.data}/>
         {this.state.items}
@@ -131,7 +131,7 @@ class MenuEpingle extends React.Component{
 class Pin extends React.Component{
   constructor(props){
     super(props)
-    this.state={hash:''}
+    this.state={hash:'',name:''}
     this.getpin=this.getpin.bind(this)
     this.getpinImage=this.getpinImage.bind(this)
   }
@@ -166,7 +166,7 @@ class Pin extends React.Component{
   render(props){
     return(
       <div>
-        Pinned : {this.props.hash}
+        Pinned : {this.props.hash} {this.props.name}
         <button onClick={this.getpin}> GET RAW FILE</button>
         <button onClick={this.getpinImage}> DISPLAY IMAGE</button>
       </div>
@@ -192,7 +192,7 @@ class ListeEpingle extends React.Component{
     this.props.data.forEach((x,i)=>{
       console.log("Liste Epingle",x,i)
       items.push(
-        <Epingle hash={x[0].hash} size={x[0].size} key={i}/>
+        <Epingle hash={x[0][0].hash} size={x[0][0].size} key={i} name={x[1]}/>
       )
     })
     return(
@@ -215,7 +215,7 @@ class Epingle extends React.Component{
   pin(props){
     console.log("pin",this.props)
     let h=this.props.hash
-
+    let name=this.props.name
     //Payer l'epinglage
     let val=1*10**16
     // let tax=this.state.prix*0.02
@@ -232,6 +232,7 @@ class Epingle extends React.Component{
     node.pin.add(h,function(err){
       console.log(err)
     })
+
     })
 
   }
@@ -239,7 +240,7 @@ class Epingle extends React.Component{
   render(props){
     return(
       <div>
-        {this.props.hash} - {this.props.size}
+        {this.props.hash} - {this.props.size} - {this.props.name}
         <button onClick={this.pin}>Pin File</button>
       </div>
     )
