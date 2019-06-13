@@ -20,9 +20,9 @@ copy and update contract address
 
     const contractAddress="0x8584eBAc96B0688625f04Dcd3c0305F5DD8457b6"
 
-update ganache id_user and its private key
+update ganache id_user
 
-    const id_user=0;
+    const id_user=1;
 
 Dapp interface at localhost:3000
 
@@ -36,3 +36,5 @@ pin file -> le fichier est epingle et est affiche dans la liste des fichies epin
 Get Raw file: affiche le binaire du fichier
 
 display file: affiche l'image
+
+Verifier que la balance du compte Ganache choisi a baisse de 0,01 par image epinglee
